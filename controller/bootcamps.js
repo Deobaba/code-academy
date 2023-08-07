@@ -10,13 +10,13 @@ const asyncHandler = require('../middleware/asynchandler')
 // @route GET /bootcamps
 // @access  public
 exports.getBootCamps = asyncHandler(async(req,res, next)=> { 
+    console.log('it entered')
     const bootcamp = await Bootcamp.find()
     res.status(200).json({
         success: true,
         count:bootcamp.length,
         data: bootcamp
     })
-
 
 })
 
@@ -31,14 +31,13 @@ exports.getBootCamp = asyncHandler(async(req,res, next)=> {
         }
         res.status(200).json({success:true, data: bootcamp})
 
-
 })
 
 // @desc  create a bootcamp
 // @route POST /bootcamps
 // @access  private
 exports.createBootCamp = asyncHandler(async(req,res, next)=> {
- 
+    console.log('it got here')
     const bootcamp = await Bootcamp.create(req.body)
 
     res.status(201).json({

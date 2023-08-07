@@ -1,13 +1,13 @@
 {
-  "name": "devcamper_api",
+  "name": "code-academy_api",
   "version": "1.0.0",
-  "description": "Devcamper backend API",
+  "description": "code-academy backend API",
   "main": "server.js",
   "scripts": {
     "start": "NODE_ENV=production node server",
     "dev": "nodemon server"
   },
-  "author": "Brad Traversy",
+  "author": "deobaba",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
