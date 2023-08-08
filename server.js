@@ -1,48 +1,94 @@
-const express = require('express')
-const dotenv = require('dotenv')
-const errorHandler = require('./middleware/error')
-const connectDB = require('./config/db')
-dotenv.config({path:'./config/config.env'})
+const path = require('path');
+const express = require('express');
+const dotenv = require('dotenv');
+const morgan = require('morgan');
+const colors = require('colors');
+const fileupload = require('express-fileupload');
+const cookieParser = require('cookie-parser');
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
+const cors = require('cors');
+const errorHandler = require('./middleware/error');
+const connectDB = require('./config/db');
 
-connectDB()
+// Load env vars
+dotenv.config({ path: './config/config.env' });
 
+// Connect to database
+connectDB();
 
-// import in the route files
-const bootcamps = require('./routes/bootcamp')
+// Route files
+const bootcamps = require('./routes/bootcamps');
+const courses = require('./routes/courses');
+const auth = require('./routes/auth');
+const users = require('./routes/users');
+const reviews = require('./routes/reviews');
 
+const app = express();
 
-const app = express()
+// Body parser
+app.use(express.json());
 
+// Cookie parser
+app.use(cookieParser());
 
-//body parser
-app.use(express.json())
+// Dev logging middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
-// mount it with app here
-// /bootcamps here links the routes
-app.use('/bootcamps',bootcamps)
+// File uploading
+app.use(fileupload());
 
+// Sanitize data
+app.use(mongoSanitize());
 
-// error midlleware , below the bootcamp middlware
-app.use(errorHandler)
+// Set security headers
+app.use(helmet());
 
+// Prevent XSS attacks
+app.use(xss());
 
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 mins
+  max: 100
+});
+app.use(limiter);
 
+// Prevent http param pollution
+app.use(hpp());
 
+// Enable CORS
+app.use(cors());
 
-const PORT = process.env.PORT
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')));
 
+// Mount routers
+app.use('/bootcamps', bootcamps);
+app.use('/courses', courses);
+app.use('/auth', auth);
+app.use('/users', users);
+app.use('/reviews', reviews);
 
+app.use(errorHandler);
 
- app.listen(PORT, () => {
+const PORT = process.env.PORT || 5000;
 
-    console.log('server is listening',`${PORT}`)
-    // console.log(__dirname)
-})
-
+const server = app.listen(
+  PORT,
+  console.log(
+    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
+  )
+);
 
 // Handle unhandled promise rejections
-// process.on('unhandledRejection', (err, promise) => {
-//     console.log(`Error: ${err.message}`);
-//     // Close server & exit process
-//     // server.close(() => process.exit(1));
-//   });
+process.on('unhandledRejection', (err, promise) => {
+  console.log(`Error: ${err.message}`.red);
+  // Close server & exit process
+  // server.close(() => process.exit(1));
+});
