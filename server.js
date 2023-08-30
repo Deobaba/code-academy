@@ -36,9 +36,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Dev logging middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
+// if (process.env.NODE_ENV === 'development') {
+//   app.use(morgan('dev'));
+// }
 
 // File uploading
 app.use(fileupload());
@@ -69,11 +69,11 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
-app.use('/bootcamps', bootcamps);
-app.use('/courses', courses);
-app.use('/auth', auth);
-app.use('/users', users);
-app.use('/reviews', reviews);
+app.use('/api/v1/bootcamps', bootcamps);
+app.use('/api/v1/courses', courses);
+app.use('/api/v1/auth', auth);
+app.use('/api/v1/users', users);
+app.use('/api/v1/reviews', reviews);
 
 app.use(errorHandler);
 

@@ -15,7 +15,6 @@ const Review = require('./models/Review');
 // Connect to DB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true
 });
